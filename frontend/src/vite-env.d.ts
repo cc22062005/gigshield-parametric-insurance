@@ -1,2 +1,9 @@
-Old: http://localhost:3000/api
-New: http://localhost:5000/api
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
