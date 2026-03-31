@@ -1,183 +1,267 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, CloudRain, ShieldAlert, History, User, IndianRupee, MapPin, Activity, AlertCircle } from 'lucide-react';
+import {
+  ShieldCheck, CloudRain, Activity, MapPin, AlertCircle, Wallet,
+  Clock, TrendingUp, Zap, FileText, ChevronRight, CloudLightning,
+  Wind, Thermometer, AlertTriangle, Ban, Check
+} from 'lucide-react';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts';
+import DashboardLayout from '../components/DashboardLayout';
+import KPICard from '../components/KPICard';
+import StatusBadge from '../components/StatusBadge';
+import ChartCard from '../components/ChartCard';
+
+// Mock data for charts
+const riskTrend = [
+  { day: 'Mon', score: 65 }, { day: 'Tue', score: 68 }, { day: 'Wed', score: 78 },
+  { day: 'Thu', score: 72 }, { day: 'Fri', score: 70 }, { day: 'Sat', score: 82 }, { day: 'Sun', score: 75 },
+];
+
+const triggerDist = [
+  { name: 'Rain', value: 45, color: '#3b82f6' },
+  { name: 'AQI', value: 25, color: '#a855f7' },
+  { name: 'Heat', value: 15, color: '#f97316' },
+  { name: 'Curfew', value: 10, color: '#eab308' },
+  { name: 'Flood', value: 5, color: '#06b6d4' },
+];
+
+const claimHistory = [
+  { id: 'clm-001', date: 'Mar 26, 2026', trigger: 'Heavy Rain', triggerIcon: CloudRain, iconColor: 'text-blue-400', status: 'paid', amount: 250, fraudScore: 95 },
+  { id: 'clm-002', date: 'Mar 31, 2026', trigger: 'Severe AQI', triggerIcon: Wind, iconColor: 'text-purple-400', status: 'approved', amount: 500, fraudScore: 91 },
+  { id: 'clm-004', date: 'Mar 28, 2026', trigger: 'Heavy Rain', triggerIcon: CloudRain, iconColor: 'text-blue-400', status: 'rejected', amount: 0, fraudScore: null },
+];
+
+const triggers = [
+  { name: 'Rainfall', icon: CloudRain, value: '8.2mm/hr', threshold: '15mm/hr', color: 'text-blue-400', bg: 'bg-blue-500/10', active: false },
+  { name: 'AQI Level', icon: Wind, value: 'AQI 342', threshold: 'AQI 400', color: 'text-purple-400', bg: 'bg-purple-500/10', active: false },
+  { name: 'Temperature', icon: Thermometer, value: '38°C', threshold: '45°C', color: 'text-orange-400', bg: 'bg-orange-500/10', active: false },
+  { name: 'Curfew', icon: AlertTriangle, value: 'Inactive', threshold: 'Active', color: 'text-amber-400', bg: 'bg-amber-500/10', active: false },
+];
 
 export default function Dashboard() {
-  const [activePlan, setActivePlan] = useState<string | null>(null);
-  const [balance, setBalance] = useState(1250);
-  const [riskScore, setRiskScore] = useState(72); // AI Mock score
-
-  // Mock processing buying policy
-  const handleBuyPlan = (planName: string, amount: number) => {
-     if(balance < amount) return alert("Insufficient wallet balance.");
-     setBalance(prev => prev - amount);
-     setActivePlan(planName);
-     
-     // Trigger Confetti or Toast here in real app
-     setTimeout(() => {
-        alert(`Successfully covered by ${planName} plan for this week!`);
-     }, 300);
-  };
+  const [activePlan] = useState<string>('Standard Cover');
+  const [balance] = useState(1250);
+  const [riskScore] = useState(72);
 
   return (
-    <div className="min-h-screen bg-dark-900 pb-20">
-      {/* Top Navbar */}
-      <nav className="bg-dark-800 border-b border-white/5 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-brand-500" />
-              <span className="font-bold text-lg tracking-wide hidden sm:block">GigShield</span>
+    <DashboardLayout>
+      <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+        {/* ── Header ──────────────────────────── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Welcome back, Raj</h1>
+            <p className="text-sm text-slate-400 flex items-center gap-1.5 mt-1">
+              <MapPin className="w-3.5 h-3.5 text-brand-400" /> Zone 4: Andheri East, Mumbai
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-dark-800 px-4 py-2 rounded-xl border border-dark-600">
+              <Wallet className="w-4 h-4 text-brand-400" />
+              <span className="font-mono font-semibold text-sm text-white">₹{balance.toFixed(2)}</span>
+            </div>
+            <Link to="/policies" className="btn-primary text-sm !py-2">
+              Buy Policy <ChevronRight className="w-4 h-4 ml-1 inline" />
             </Link>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 bg-dark-900 px-4 py-2 rounded-full border border-slate-700">
-                <IndianRupee className="w-4 h-4 text-green-400" />
-                <span className="font-mono font-bold text-sm tracking-widest">{balance.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* ── KPI Row ─────────────────────────── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <KPICard icon={ShieldCheck} label="Active Policy" value={activePlan} trend={{ value: '7d left', positive: true }} />
+          <KPICard icon={Wallet} label="Weekly Premium" value="₹97" iconColor="text-emerald-400" iconBg="bg-emerald-500/10" />
+          <KPICard icon={Clock} label="Coverage Hours" value="168h" trend={{ value: '24/7', positive: true }} iconColor="text-blue-400" iconBg="bg-blue-500/10" />
+          <KPICard icon={TrendingUp} label="Total Protected" value="₹47,500" trend={{ value: '+12%', positive: true }} iconColor="text-amber-400" iconBg="bg-amber-500/10" />
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* ── Left Column ───────────────────── */}
+          <div className="space-y-6">
+            {/* Active Policy Card */}
+            <div className="glass-card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-brand-400" /> Active Policy
+                </h3>
+                <StatusBadge status="active" />
               </div>
-              <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center border-2 border-slate-600">
-                <User className="w-5 h-5 text-slate-300" />
+              <div className="bg-brand-500/5 border border-brand-500/15 rounded-xl p-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-brand-500 blur-3xl opacity-10" />
+                <p className="text-xs text-brand-300 font-semibold tracking-wider mb-1">WEEKLY COVER</p>
+                <h4 className="text-xl font-bold text-white mb-3">{activePlan}</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-400">Premium</span> <span className="text-white font-semibold">₹97/week</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Max Payout</span> <span className="text-white font-semibold">₹500/day</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Valid Until</span> <span className="text-slate-300">Apr 06, 11:59 PM</span></div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {['Rain', 'AQI'].map(t => (
+                    <span key={t} className="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 border border-brand-500/20">{t}</span>
+                  ))}
+                </div>
+              </div>
+              <Link to="/admin" className="mt-4 w-full btn-secondary text-xs flex items-center justify-center gap-2 !py-2">
+                <Zap className="w-3.5 h-3.5" /> Simulate Claim (Demo)
+              </Link>
+            </div>
+
+            {/* Risk Score */}
+            <div className="glass-card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-brand-400" /> AI Risk Score
+                </h3>
+                <span className="text-lg font-bold text-brand-400">{riskScore}/100</span>
+              </div>
+              <div className="h-2.5 w-full bg-dark-700 rounded-full overflow-hidden mb-3">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-brand-500 via-amber-500 to-red-500 transition-all duration-1000"
+                  style={{ width: `${riskScore}%` }}
+                />
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between"><span className="text-slate-400">Weather Risk</span> <span className="text-slate-300">82/100</span></div>
+                <div className="flex justify-between"><span className="text-slate-400">Pollution</span> <span className="text-slate-300">60/100</span></div>
+                <div className="flex justify-between"><span className="text-slate-400">Disruptions</span> <span className="text-slate-300">70/100</span></div>
+                <div className="flex justify-between"><span className="text-slate-400">Claim History</span> <span className="text-slate-300">50/100</span></div>
+              </div>
+              <div className="mt-4 flex gap-2 items-start bg-amber-500/5 p-3 rounded-xl border border-amber-500/10">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-200/70">High rain probability this week. Pro Cover recommended.</p>
               </div>
             </div>
-        </div>
-      </nav>
+          </div>
 
-      <main className="max-w-7xl mx-auto px-4 pt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Col: Profile & Risk Score */}
-        <div className="space-y-6">
-           <div className="glass-card flex flex-col items-center">
-              <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-4 relative overflow-hidden ring-4 ring-brand-500/20">
-                 <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="Rider Profile" className="w-full h-full object-cover" />
+          {/* ── Middle Column ─────────────────── */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Live Trigger Status */}
+            <div className="glass-card">
+              <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-brand-400" /> Live Trigger Monitor
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-brand-500/10 text-brand-400">REAL-TIME</span>
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {triggers.map((t, i) => (
+                  <div key={i} className={`rounded-xl p-3 border ${t.active ? 'border-red-500/30 bg-red-500/5' : 'border-white/[0.04] bg-dark-800/40'}`}>
+                    <div className={`w-8 h-8 rounded-lg ${t.bg} flex items-center justify-center mb-2`}>
+                      <t.icon className={`w-4 h-4 ${t.color}`} />
+                    </div>
+                    <p className="text-xs text-slate-400">{t.name}</p>
+                    <p className="text-sm font-semibold text-white">{t.value}</p>
+                    <p className="text-[10px] text-slate-500">Threshold: {t.threshold}</p>
+                  </div>
+                ))}
               </div>
-              <h2 className="text-xl font-bold">Raj Kumar</h2>
-              <p className="text-slate-400 text-sm flex items-center gap-1 mt-1">
-                 <MapPin className="w-3 h-3" /> Zone 4: Andheri East
-              </p>
-              
-              <div className="w-full h-[1px] bg-slate-700 my-6"></div>
-              
-              <div className="w-full">
-                 <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-slate-400 flex items-center gap-2"><Activity className="w-4 h-4 text-brand-400"/> AI Risk Score</span>
-                    <span className="font-bold text-brand-400">{riskScore}/100</span>
-                 </div>
-                 <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{ width: `${riskScore}%` }}></div>
-                 </div>
-                 <div className="mt-3 flex gap-2 items-start bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20">
-                   <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0" />
-                   <p className="text-xs text-yellow-200/70">Warning: High rain probability in your zone this week. Recommend upgrading risk tier.</p>
-                 </div>
-              </div>
-           </div>
+            </div>
 
-           {/* Active Coverage */}
-           <div className="glass-card">
-               <h3 className="font-bold text-lg mb-4 flex items-center gap-2 opacity-90"><ShieldCheck className="w-5 h-5 text-green-400"/> Active Policy</h3>
-               
-               {activePlan ? (
-                 <div className="bg-brand-900/40 border border-brand-500/30 p-4 rounded-xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-brand-500 blur-2xl opacity-20"></div>
-                    <div className="flex justify-between items-start mb-4">
-                       <div>
-                          <p className="text-xs text-brand-300 font-bold tracking-wider mb-1">WEEKLY COVER</p>
-                          <h4 className="text-2xl font-black text-white">{activePlan}</h4>
-                       </div>
-                       <div className="px-2 py-1 text-xs font-bold bg-green-500/20 text-green-400 rounded">ACTIVE</div>
-                    </div>
-                    <div className="space-y-2 text-sm text-slate-300">
-                      <div className="flex justify-between"><span>Max Payout</span> <span className="font-bold text-white">₹500/day</span></div>
-                      <div className="flex justify-between"><span>Valid Until</span> <span>Sun, 11:59 PM</span></div>
-                    </div>
-                    <Link to="/admin" className="mt-6 w-full btn-secondary text-sm py-2 bg-dark-900 justify-center flex">Simulate Claim Trigger (Demo)</Link>
-                 </div>
-               ) : (
-                 <div className="border border-dashed border-slate-600 rounded-xl p-6 text-center">
-                    <ShieldAlert className="w-8 h-8 text-slate-500 mx-auto mb-3" />
-                    <p className="text-sm text-slate-400">No active coverage for this week.</p>
-                    <p className="text-xs mt-1 text-brand-400">Purchase a plan to secure your earnings.</p>
-                 </div>
-               )}
-           </div>
-        </div>
-
-        {/* Right Col: Buy UI & History */}
-        <div className="lg:col-span-2 space-y-6">
-           <h2 className="text-2xl font-bold mb-6">Weekly Protections</h2>
-           
-           <div className="grid sm:grid-cols-2 gap-4 auto-rows-fr">
-              {/* Plan 1 */}
-              <div className={`p-6 rounded-2xl border transition-all cursor-pointer hover:border-blue-400/50 ${activePlan === 'Basic Cover' ? 'bg-blue-900/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'bg-dark-800/60 border-slate-700/50'}`}>
-                 <div className="flex justify-between items-start mb-4">
-                    <div className="bg-slate-800 p-2 rounded-lg">
-                      <CloudRain className="text-blue-400 w-6 h-6" />
-                    </div>
-                    <div className="text-right">
-                       <span className="text-2xl font-black">₹39</span><span className="text-sm text-slate-400">/wk</span>
-                    </div>
-                 </div>
-                 <h3 className="font-bold text-lg text-white mb-1">Basic Cover</h3>
-                 <p className="text-sm text-slate-400 mb-4 h-10">Covers heavy rainfall disrupting deliveries.</p>
-                 <button 
-                  onClick={() => handleBuyPlan('Basic Cover', 39)}
-                  disabled={activePlan === 'Basic Cover'}
-                  className={`w-full py-2 rounded-lg font-medium text-sm transition-all ${activePlan === 'Basic Cover' ? 'bg-blue-500/20 text-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
-                 >
-                   {activePlan === 'Basic Cover' ? 'Current Plan' : 'Buy for ₹39'}
-                 </button>
-              </div>
-
-              {/* Plan 2 */}
-              <div className={`p-6 rounded-2xl border transition-all cursor-pointer hover:border-brand-400/50 ${activePlan === 'Standard Cover' ? 'bg-brand-900/20 border-brand-500 shadow-[0_0_15px_rgba(37,99,235,0.3)]' : 'bg-dark-800/60 border-slate-700/50 relative overflow-hidden'}`}>
-                 {activePlan !== 'Standard Cover' && <div className="absolute top-0 right-0 py-1 px-3 bg-brand-600 text-[10px] font-black tracking-widest rounded-bl-lg">RECOMMENDED</div>}
-                 
-                 <div className="flex justify-between items-start mb-4">
-                    <div className="bg-brand-900/30 p-2 rounded-lg">
-                      <ShieldAlert className="text-brand-400 w-6 h-6" />
-                    </div>
-                    <div className="text-right">
-                       <span className="text-2xl font-black">₹69</span><span className="text-sm text-slate-400">/wk</span>
-                    </div>
-                 </div>
-                 <h3 className="font-bold text-lg text-white mb-1">Standard Cover</h3>
-                 <p className="text-sm text-slate-400 mb-4 h-10">Rain + Severe AQI. Up to ₹500/day payout.</p>
-                 <button 
-                  onClick={() => handleBuyPlan('Standard Cover', 69)}
-                  disabled={activePlan === 'Standard Cover'}
-                  className={`w-full py-2 rounded-lg font-medium text-sm transition-all ${activePlan === 'Standard Cover' ? 'bg-brand-500/20 text-brand-400 cursor-not-allowed' : 'bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white shadow-lg shadow-brand-500/20'}`}
-                 >
-                   {activePlan === 'Standard Cover' ? 'Current Plan' : 'Buy for ₹69'}
-                 </button>
-              </div>
-           </div>
-
-           <div className="mt-8">
-             <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><History className="w-5 h-5" /> Recent Claim History</h3>
-             <div className="glass-card !p-0 overflow-hidden text-sm">
-                <div className="grid grid-cols-4 gap-4 p-4 bg-slate-800/50 font-semibold text-slate-300">
-                   <div>Date</div>
-                   <div>Trigger</div>
-                   <div>Status</div>
-                   <div className="text-right">Amount</div>
+            {/* Charts Row */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              <ChartCard title="Risk Score Trend" subtitle="Last 7 days">
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={riskTrend}>
+                      <defs>
+                        <linearGradient id="riskGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                      <XAxis dataKey="day" stroke="#475569" tick={{ fontSize: 11 }} />
+                      <YAxis stroke="#475569" tick={{ fontSize: 11 }} domain={[50, 100]} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
+                        itemStyle={{ color: '#10b981' }}
+                      />
+                      <Area type="monotone" dataKey="score" stroke="#10b981" strokeWidth={2} fill="url(#riskGrad)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="divide-y divide-slate-700/50">
-                   <div className="grid grid-cols-4 gap-4 p-4 items-center">
-                      <div className="text-slate-400">Oct 12, 2025</div>
-                      <div className="flex items-center gap-2"><CloudRain className="w-4 h-4 text-blue-400"/> Heavy Rain</div>
-                      <div><span className="bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-1 rounded text-xs font-bold">PAID</span></div>
-                      <div className="text-right font-mono text-white">+ ₹250.00</div>
-                   </div>
-                   <div className="grid grid-cols-4 gap-4 p-4 items-center">
-                      <div className="text-slate-400">Sep 04, 2025</div>
-                      <div className="flex items-center gap-2"><Activity className="w-4 h-4 text-yellow-400"/> Local Strike</div>
-                      <div><span className="bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-1 rounded text-xs font-bold">REJECTED</span></div>
-                      <div className="text-right text-slate-500">₹0.00</div>
-                   </div>
-                </div>
-             </div>
-           </div>
+              </ChartCard>
 
+              <ChartCard title="Trigger Distribution" subtitle="Your zone past 30 days">
+                <div className="h-48 flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={triggerDist} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value" paddingAngle={3}>
+                        {triggerDist.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex flex-wrap gap-3 mt-2">
+                  {triggerDist.map((d, i) => (
+                    <div key={i} className="flex items-center gap-1.5 text-xs text-slate-400">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
+                      {d.name} {d.value}%
+                    </div>
+                  ))}
+                </div>
+              </ChartCard>
+            </div>
+
+            {/* Claims History Table */}
+            <div className="glass-card !p-0 overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/[0.04] flex items-center justify-between">
+                <h3 className="font-semibold text-white flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-brand-400" /> Recent Claims
+                </h3>
+                <Link to="/claims" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
+                  View All →
+                </Link>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-dark-800/50">
+                      <th className="table-header text-left px-6 py-3">Date</th>
+                      <th className="table-header text-left px-6 py-3">Trigger</th>
+                      <th className="table-header text-left px-6 py-3">Status</th>
+                      <th className="table-header text-left px-6 py-3">Fraud</th>
+                      <th className="table-header text-right px-6 py-3">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {claimHistory.map(claim => (
+                      <tr key={claim.id} className="table-row">
+                        <td className="px-6 py-3.5 text-slate-400">{claim.date}</td>
+                        <td className="px-6 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <claim.triggerIcon className={`w-4 h-4 ${claim.iconColor}`} />
+                            <span className="text-white">{claim.trigger}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3.5"><StatusBadge status={claim.status} /></td>
+                        <td className="px-6 py-3.5">
+                          {claim.fraudScore ? (
+                            <span className="text-xs font-mono text-brand-400">{claim.fraudScore}/100 ✓</span>
+                          ) : (
+                            <span className="text-xs text-slate-500">N/A</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-3.5 text-right">
+                          {claim.amount > 0 ? (
+                            <span className="font-mono text-brand-400 font-semibold">+ ₹{claim.amount}</span>
+                          ) : (
+                            <span className="text-slate-500">₹0</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

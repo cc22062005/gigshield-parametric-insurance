@@ -1,18 +1,21 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
+import PolicyManagement from './pages/PolicyManagement';
+import ClaimsManagement from './pages/ClaimsManagement';
 import AdminSimulator from './pages/AdminSimulator';
+import DashboardLayout from './components/DashboardLayout';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-dark-900 text-white font-sans selection:bg-brand-500 selection:text-white">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminSimulator />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/policies" element={<DashboardLayout><PolicyManagement /></DashboardLayout>} />
+        <Route path="/claims" element={<DashboardLayout><ClaimsManagement /></DashboardLayout>} />
+        <Route path="/admin" element={<DashboardLayout><AdminSimulator /></DashboardLayout>} />
+      </Routes>
     </BrowserRouter>
   );
 }
