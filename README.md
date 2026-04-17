@@ -1,4 +1,3 @@
-```md
 # GigShield: Automated Income Protection for Delivery Workers
 
 > **[Pitch Deck — Final DEVTrails 2026 Presentation](PASTE_PUBLIC_PITCH_DECK_LINK_HERE)**  
@@ -157,7 +156,6 @@ graph TD
     API --> S
 ```
 
----
 
 ## Phase 3 Highlights
 
