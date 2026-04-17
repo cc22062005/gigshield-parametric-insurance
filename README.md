@@ -266,4 +266,3 @@ The final demo shows:
 ---
 
 *Built for Guidewire DEVTrails 2026. Data shown in the demo may be simulated for presentation purposes.*
-```
