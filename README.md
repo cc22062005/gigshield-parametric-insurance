@@ -1,9 +1,31 @@
+```md
 # GigShield: Automated Income Protection for Delivery Workers
 
 > **[Pitch Deck — Final DEVTrails 2026 Presentation](PASTE_PUBLIC_PITCH_DECK_LINK_HERE)**  
 > **[Demo Video — 5-Minute Technical Walkthrough](PASTE_PUBLIC_DEMO_VIDEO_LINK_HERE)**
 
 GigShield is a parametric income-protection platform built for food and grocery delivery workers. It protects riders against verified external disruptions such as heavy rain, severe pollution, floods, and local curfews that reduce working hours and cause immediate wage loss. The platform combines a deterministic parametric rule engine with an ML-based fraud scoring service to enable transparent claim automation, simulated instant payouts, and intelligent worker/admin dashboards.[file:3]
+
+---
+
+## Table of Contents
+- [The Problem](#the-problem)
+- [Our Persona](#our-persona)
+- [Why Parametric Insurance](#why-parametric-insurance)
+- [How GigShield Works](#how-gigshield-works)
+- [Platform Intelligence: Rules + ML](#platform-intelligence-rules--ml)
+- [Key Features](#key-features)
+- [Dashboards](#dashboards)
+- [Architecture](#architecture)
+- [Phase 3 Highlights](#phase-3-highlights)
+- [Local Setup](#local-setup)
+- [Demo Flow](#demo-flow)
+- [Limitations](#limitations)
+- [Future Work](#future-work)
+- [Pitch Deck](#pitch-deck)
+- [Demo Video](#demo-video)
+- [Repository Access](#repository-access)
+- [Tech Stack](#tech-stack)
 
 ---
 
@@ -133,3 +155,117 @@ graph TD
     PM --> PAY
     PM --> DB
     API --> S
+```
+
+---
+
+## Phase 3 Highlights
+
+GigShield was upgraded for the final Phase 3 submission with:
+- Advanced fraud detection for delivery-specific abuse patterns.
+- Simulated instant payouts for clear demo flow.
+- A scenario simulator to trigger fake disruptions live.
+- Worker and insurer dashboards for clear judging visibility.
+- Honest separation of deterministic logic and ML-based scoring.[file:3]
+
+---
+
+## Local Setup
+
+### Requirements
+- Node.js 18+
+- Python 3.10+ for the ML service
+- PostgreSQL
+- Docker optional
+
+### Run the project
+
+```bash
+# Frontend
+cd frontend
+npm install
+npm run dev
+```
+
+```bash
+# Backend
+cd backend
+npm install
+npm run dev
+```
+
+```bash
+# ML Fraud Service
+cd ml-service
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+If you use Docker locally, start the database and supporting services first, then run the frontend, backend, and ML service in separate terminals.
+
+---
+
+## Demo Flow
+
+The final demo shows:
+1. Worker onboarding.
+2. Weekly policy purchase.
+3. Simulated rain or pollution disruption.
+4. Automatic claim creation.
+5. ML fraud scoring.
+6. Instant payout simulation.
+7. Dashboard refresh for worker and admin views.[file:3]
+
+---
+
+## Limitations
+
+- External disruption feeds may be simulated for the demo.
+- Instant payout is a mock or sandbox flow, not a real money transfer.
+- Fraud scoring is lightweight and designed for hackathon-scale demonstration.
+- Predictive analytics are best treated as decision support, not guaranteed forecasts.[file:3]
+
+---
+
+## Future Work
+
+- Replace mock feeds with production weather and disruption APIs.
+- Improve ML models with larger historical datasets.
+- Add stronger payout integration with a real payment gateway.
+- Expand to more delivery personas and cities.
+- Add deeper explainability for fraud and risk scoring.[file:3]
+
+---
+
+## Pitch Deck
+
+**Public link:** `PASTE_PUBLIC_PITCH_DECK_LINK_HERE`
+
+## Demo Video
+
+**Public link:** `PASTE_PUBLIC_DEMO_VIDEO_LINK_HERE`
+
+---
+
+## Repository Access
+
+- Public Git repository: `PASTE_GIT_REPO_LINK_HERE`
+- Hosted demo: `PASTE_HOSTED_DEMO_LINK_HERE`
+
+---
+
+## Tech Stack
+
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- Node.js + Express
+- PostgreSQL
+- Python + FastAPI
+- scikit-learn
+- Recharts
+
+---
+
+*Built for Guidewire DEVTrails 2026. Data shown in the demo may be simulated for presentation purposes.*
+```
