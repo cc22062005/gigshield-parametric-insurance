@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ShieldCheck, CloudRain, Activity, MapPin, AlertCircle, Wallet,
   Clock, TrendingUp, Zap, FileText, ChevronRight, CloudLightning,
-  Wind, Thermometer, AlertTriangle, Ban, Check
+  Wind, Thermometer, AlertTriangle, Ban, Check, CheckCircle2
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -13,6 +13,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import KPICard from '../components/KPICard';
 import StatusBadge from '../components/StatusBadge';
 import ChartCard from '../components/ChartCard';
+import api from '../services/api';
 
 // Mock data for charts
 const riskTrend = [
@@ -28,7 +29,7 @@ const triggerDist = [
   { name: 'Flood', value: 5, color: '#06b6d4' },
 ];
 
-const claimHistory = [
+const initialClaimHistory = [
   { id: 'clm-001', date: 'Mar 26, 2026', trigger: 'Heavy Rain', triggerIcon: CloudRain, iconColor: 'text-blue-400', status: 'paid', amount: 250, fraudScore: 95 },
   { id: 'clm-002', date: 'Mar 31, 2026', trigger: 'Severe AQI', triggerIcon: Wind, iconColor: 'text-purple-400', status: 'approved', amount: 500, fraudScore: 91 },
   { id: 'clm-004', date: 'Mar 28, 2026', trigger: 'Heavy Rain', triggerIcon: CloudRain, iconColor: 'text-blue-400', status: 'rejected', amount: 0, fraudScore: null },
@@ -43,12 +44,53 @@ const triggers = [
 
 export default function Dashboard() {
   const [activePlan] = useState<string>('Standard Cover');
-  const [balance] = useState(1250);
+  const [balance, setBalance] = useState(1250);
   const [riskScore] = useState(72);
+  const [claimHistory, setClaimHistory] = useState(initialClaimHistory);
+  
+  // Notification States
+  const [notification, setNotification] = useState<{title: string, desc: string, show: boolean, type: 'alert'|'success'}>({title: '', desc: '', show: false, type: 'alert'});
+
+  const triggerInstantPayoutDemo = async () => {
+    // 1. Alert event matched
+    setNotification({ title: 'Rainfall Event Detected', desc: 'Validating zone data against active policy...', show: true, type: 'alert' });
+    
+    setTimeout(async () => {
+      // 2. ML Fraud Verify
+      setNotification({ title: 'ML Fraud Check', desc: 'Evaluating telemetry integrity...', show: true, type: 'alert' });
+      const mlRes = await api.post('/claims/fraud-check', { claimId: 'clm_demo' });
+      
+      setTimeout(() => {
+        // 3. Paid
+        setBalance(prev => prev + 500);
+        setClaimHistory(prev => [{
+            id: `clm-demo-${Date.now()}`, date: 'Now', trigger: 'Cloudburst Demo', triggerIcon: CloudRain, iconColor: 'text-blue-400', status: 'paid', amount: 500, fraudScore: 98
+          }, ...prev]);
+        setNotification({ title: 'Payout Successful', desc: '₹500 automatically credited to your wallet via UPI.', show: true, type: 'success' });
+        
+        // Hide notification after 4s
+        setTimeout(() => setNotification({ ...notification, show: false }), 4000);
+      }, 1500);
+    }, 2000);
+  };
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <div className="p-6 lg:p-8 space-y-6 animate-fade-in relative z-0">
+        
+        {/* Floating Notification Panel */}
+        {notification.show && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-bounce-in w-full max-w-sm">
+            <div className={`p-4 rounded-xl border shadow-2xl backdrop-blur-md ${notification.type === 'success' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-100' : 'bg-blue-500/20 border-blue-500/40 text-blue-100'} flex items-start gap-4`}>
+              {notification.type === 'success' ? <CheckCircle2 className="w-6 h-6 shrink-0 text-emerald-400"/> : <Zap className="w-6 h-6 shrink-0 text-blue-400 animate-pulse"/>}
+              <div>
+                <h4 className="font-bold">{notification.title}</h4>
+                <p className="text-sm opacity-90 mt-1">{notification.desc}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Header ──────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -58,7 +100,7 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-dark-800 px-4 py-2 rounded-xl border border-dark-600">
+            <div className={`flex items-center gap-2 bg-dark-800 px-4 py-2 rounded-xl border transition-all duration-500 ${notification.type === 'success' ? 'border-brand-500 shadow-glow-green scale-105' : 'border-dark-600'}`}>
               <Wallet className="w-4 h-4 text-brand-400" />
               <span className="font-mono font-semibold text-sm text-white">₹{balance.toFixed(2)}</span>
             </div>
@@ -102,16 +144,16 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-              <Link to="/admin" className="mt-4 w-full btn-secondary text-xs flex items-center justify-center gap-2 !py-2">
-                <Zap className="w-3.5 h-3.5" /> Simulate Claim (Demo)
-              </Link>
+              <button onClick={triggerInstantPayoutDemo} disabled={notification.show} className="mt-4 w-full btn-secondary text-xs flex items-center justify-center gap-2 !py-2 disabled:opacity-50">
+                <Zap className="w-3.5 h-3.5" /> Simulate Instant Payout Push
+              </button>
             </div>
 
             {/* Risk Score */}
             <div className="glass-card">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-white flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-brand-400" /> AI Risk Score
+                  <Activity className="w-4 h-4 text-brand-400" /> Insurer Risk Score
                 </h3>
                 <span className="text-lg font-bold text-brand-400">{riskScore}/100</span>
               </div>
@@ -224,13 +266,13 @@ export default function Dashboard() {
                       <th className="table-header text-left px-6 py-3">Date</th>
                       <th className="table-header text-left px-6 py-3">Trigger</th>
                       <th className="table-header text-left px-6 py-3">Status</th>
-                      <th className="table-header text-left px-6 py-3">Fraud</th>
+                      <th className="table-header text-left px-6 py-3">Fraud Integrity</th>
                       <th className="table-header text-right px-6 py-3">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     {claimHistory.map(claim => (
-                      <tr key={claim.id} className="table-row">
+                      <tr key={claim.id} className="table-row transition-all duration-300">
                         <td className="px-6 py-3.5 text-slate-400">{claim.date}</td>
                         <td className="px-6 py-3.5">
                           <div className="flex items-center gap-2">
@@ -241,14 +283,14 @@ export default function Dashboard() {
                         <td className="px-6 py-3.5"><StatusBadge status={claim.status} /></td>
                         <td className="px-6 py-3.5">
                           {claim.fraudScore ? (
-                            <span className="text-xs font-mono text-brand-400">{claim.fraudScore}/100 ✓</span>
+                            <span className="text-xs font-mono text-brand-400">Score Verified ✓</span>
                           ) : (
                             <span className="text-xs text-slate-500">N/A</span>
                           )}
                         </td>
                         <td className="px-6 py-3.5 text-right">
                           {claim.amount > 0 ? (
-                            <span className="font-mono text-brand-400 font-semibold">+ ₹{claim.amount}</span>
+                           <span className="font-mono text-brand-400 font-semibold">+ ₹{claim.amount}</span>
                           ) : (
                             <span className="text-slate-500">₹0</span>
                           )}

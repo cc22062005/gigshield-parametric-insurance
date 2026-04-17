@@ -1,117 +1,139 @@
-# GigShield AI
+# GigShield: Automated Income Protection for Delivery Workers
 
-> **AI-Powered Parametric Insurance for India's Gig Delivery Partners**
+> **[Pitch Deck — View Our Final DEVTrails 2026 Presentation here](#)** (Replace with actual link)  
+> **[Demo Video — Watch the 5-Minute Technical Walkthrough here](#)** (Replace with actual link)
 
-GigShield is a parametric, weather/disruption-based insurance platform designed exclusively for food and grocery delivery riders (Zomato/Swiggy/Zepto/Blinkit). It protects them against income loss caused by external factors out of their control, such as heavy rain, severe pollution, local curfews, or strikes.
+GigShield is a data-driven parametric insurance platform designed exclusively for food and grocery delivery riders (Zomato/Swiggy/Zepto). We protect them against income loss caused by verified external disruptions like **heavy rain, severe pollution, and local curfews**.
 
-## ⚠️ Problem Overview
+## ⚠️ The Problem & Our Persona
 
-Delivery riders operate on razor-thin margins and face severe risks of daily wage loss.
+**Raj** is a full-time Zomato rider in Bangalore making ₹800/day.  
+When heavy monsoons flood his delivery zone, Raj cannot work. **He loses 100% of his daily income**, while his bike EMI, rent, and fuel costs continue. Traditional insurance only covers accidents or health—it offers zero protection for weather-driven wage loss. Even if it did, the 30-day claims process is unworkable for gig workers who need cash *today*.
 
-| Risk Category | Impact on Rider | Frequency |
-| --- | --- | --- |
-| **Severe Weather** | Waterlogged roads, higher accident risk, low demand | High (Monsoon) |
-| **Air Pollution** | Health hazards (AQI > 400 in NCR) | High (Winters) |
-| **Civic Disruptions** | Local curfews, internet shutdowns preventing orders | Medium |
+## 🚀 The GigShield Solution: Parametric Micro-Insurance
 
-### Target Persona
-- **Name**: Raj
-- **Occupation**: Full-time Zomato/Swiggy Rider in Bangalore
-- **Monthly Income**: ₹15k - ₹20k
-- **Pain Point**: "When it rains heavily, I can't deliver. I lose that day's wages, but my bike EMI and fuel costs remain the same."
+GigShield solves this by removing the human adjuster entirely. We use **conditional logic tied to public data APIs** to automatically trigger payouts.
 
-## 🚀 Solution Overview
+### The 3 Pillars of GigShield
+1. **Weekly Pricing Model**: Gig workers earn weekly, so our pricing fits their cash flow (e.g., ₹49/week).
+2. **Data-Driven Triggers**: We monitor OpenWeatherMap and CPCB APIs. If Rain > 15mm/hr in Raj's zone, the policy is triggered.
+3. **Instant Payouts**: Zero paperwork. The moment a disruption is verified, the system transfers the lost wages directly to the worker's wallet.
 
-GigShield provides **Parametric Insurance** - insurance that pays out automatically when a predefined event (parameter) is met, bypassing traditional claims adjusters and lengthy approval times.
+---
 
-| Platform | Benefit |
-| --- | --- |
-| **Data-Driven Triggers** | Uses OpenWeatherMap, IMD, CPCB, and News APIs to track local disruptions. |
-| **Instant Payouts** | Smart contracts/rule-engine processes immediate micro-payments. |
-| **Flexible Coverage** | Bite-sized weekly policies instead of rigid annual plans. |
+## 🧠 Platform Intelligence: Rules + ML
 
-### Key Features
-- Dynamic Weekly Premium generation.
-- Real-time weather/disruption tracking.
-- Instant Automated Claims processing.
-- AI Risk Scoring & Fraud Defense.
+In Phase 3, we transitioned from generic "AI" to a highly practical, honest architecture combining deterministic rules for reliability with Machine Learning for fraud defense.
 
-## 📊 Parametric Insurance Model
+### 1. Deterministic Rule Engine (Node.js)
+Payouts must be transparent. Our core engine uses strict threshold rules (e.g., `Rainfall > 60mm`) to guarantee fair and predictable payouts without black-box logic.
 
-| Trigger Event | Data Source (Phase-1) | Payout Condition |
-| --- | --- | --- |
-| **Heavy Rainfall** | OpenWeatherMap API | > 15mm continuous rain for 3 hours in rider's zone. |
-| **Severe AQI** | CPCB / OpenWeather API | AQI > 400 for 2 consecutive days. |
-| **Local Curfew** | NewsAPI / Govt RSS | Official Sec 144 / Internet shutdown reported. |
+### 2. ML Fraud Detection Service (Python FastAPI + scikit-learn)
+Location spoofing is the #1 threat to gig platforms.
+Before any parametric payout is authorized, the claim telemetry (GPS confidence, zone distance, activity correlation) is shipped to our **Machine Learning Classification Service**.
+- We use a localized `RandomForestClassifier` to generate a real-time anomaly score.
+- **Auto-Approval**: If the fraud score is low (< 0.3), the payout fires instantly.
+- **Manual Review**: If the score is high, it is routed to the Admin Dashboard for inspection.
 
-### Weekly Premium Model (Example pricing)
-Weekly policies matching the gig-worker payout cycle.
-- **₹39 (Basic)**: Payout up to ₹250/day. Covers Rain only.
-- **₹69 (Standard)**: Payout up to ₹500/day. Rain + AQI.
-- **₹99 (Pro)**: Payout up to ₹750/day. Comprehensive (Rain, AQI, Curfews).
-
-## 🧠 AI/ML Integration
-
-| Component | Functionality (Mock in Phase-1) | ML Approach |
-| --- | --- | --- |
-| **Risk Profiling** | Scores rider risk based on historical zone data and season. | Gradient Boosting Regressor (simulated) |
-| **Dynamic Pricing** | Adjusts weekly policy cost based on upcoming weather forecasts. | Time-series forecasting |
-
-## 🛡️ Fraud Detection & Adversarial Defense
-
-Protecting the platform against bad actors faking claims.
-
-1. **GPS Spoofing Defense**: Device signals (mock location enabled flags), checking against network cell towers.
-2. **Behavioral Checks**: Improbable travel speeds (e.g., claiming to move from Delhi to Mumbai in 5 mins).
-3. **Graph Anomalies**: Sybil attack prevention (multiple identical claim triggers from the exact same lat/long polygon).
-
-*In Phase-1 demo, you can toggle a "GPS Spoofing" mode to witness the system automatically reject a fraudulent claim.*
+---
 
 ## ⚙️ Tech Stack & Architecture
 
-| Layer | Technologies |
+| Component | Technology |
 | --- | --- |
-| **Frontend** | React (TypeScript), Tailwind CSS, Vite, Recharts, React-Leaflet |
-| **Backend** | Node.js, Express.js |
-| **Database** | PostgreSQL |
-| **Caching** | Redis (Mock event state) |
-| **Authentication** | JWT (JSON Web Tokens) |
-| **Infrastructure** | Docker, Vercel (UI), Render (API) |
+| **Worker & Admin UI** | React (TS), Tailwind, Recharts, Vite |
+| **Core API & Rule Engine** | Node.js, Express, PostgreSQL |
+| **Fraud ML Microservice** | Python, FastAPI, scikit-learn |
 
-### System Workflow
-1. Rider Registers -> AI generates Risk Profile.
-2. Rider buys Weekly Policy -> DB creates coverage active status.
-3. System (Cron jobs) polls data APIs (Weather/News) for rider's zones.
-4. Threshold exceeded -> Trigger Claim.
-5. Fraud Check applied -> If valid, Payout processed to Wallet.
+```mermaid
+graph TD
+    %% Frontend Layer
+    subgraph Frontend Apps
+        W[Worker Mobile-Web App]
+        A[Admin/Insurer Dashboard]
+        DS[Demo Scenario Simulator]
+    end
 
-## 🛣️ Implementation Roadmap & Setup
+    %% Backend Services Layer
+    subgraph Core Node.js Backend
+        API[Express API Gateway]
+        RE[Rule & Policy Engine]
+        PEM[Parametric Event Monitor]
+        PM[Payout Module]
+    end
+
+    %% Intelligence Layer
+    subgraph Python Intelligence Service
+        ML[Fraud Detection ML Model]
+    end
+
+    %% Data Layer
+    subgraph Data & State
+        DB[(PostgreSQL)]
+        Cache[(Redis / Mock State)]
+    end
+
+    %% External / Mocked Dependencies
+    subgraph External simulated
+        OW[Mock Weather API]
+        PG[Mock Payment Gateway]
+    end
+
+    %% Flows
+    W -->|Purchase Policy| API
+    A -->|View Analytics| API
+    DS -->|Trigger Disruption| PEM
+    
+    API --> RE
+    RE --> DB
+    PEM --> API
+    
+    PEM -.->|Fetch weather data| OW
+    
+    %% Claim Loop
+    RE -->|Evaluate limits| ML
+    ML -->|Fraud Score| RE
+    RE -->|If Score Low| PM
+    PM -.->|Trigger Transfer| PG
+```
+
+---
+
+## 🏆 Phase 3 Implementations for DEVTrails
+
+- **Honest AI Service**: Extracted fraud scoring into a dedicated Python microservice.
+- **Demo Scenario Simulator**: A dedicated admin panel enabling judges/presenters to instantly fire mock weather events and watch the ML and Payout systems react in real-time.
+- **Worker Wallet UI**: Completes the loop by showing instant, transparent payouts on the mobile web view.
+
+---
+
+## 🛣️ Local Setup & Evaluation
+
+The platform is designed to be easily reproducible for judging.
 
 ### Requirements
 - Node.js 18+
-- Docker & docker-compose
+- Python 3.10+ (for ML service)
+- PostgreSQL
+- Docker (optional)
 
-### Getting Started
-
-1. Clone repo & start Database
+### Quick Start
+1. **Start the DB & Core Services**
 ```bash
 docker-compose up -d
 ```
 
-2. Start Backend
+2. **Start the Frontend & Backend**
 ```bash
-cd backend
-npm install
-npm run dev
-```
+# Terminal 1: Backend
+cd backend && npm install && npm run dev
 
-3. Start Frontend
-```bash
-cd frontend
-npm install
-npm run dev
+# Terminal 2: Frontend
+cd frontend && npm install && npm run dev
+
+# Terminal 3: ML Fraud Service
+cd ml-service && pip install -r requirements.txt && uvicorn main:app --reload
 ```
 
 ---
-**Designed for Phase-1 Hackathon Excellence!**
-By RiskOps
+*Built for Guidewire DEVTrails 2026. Data displayed is for demonstration simulation.*
