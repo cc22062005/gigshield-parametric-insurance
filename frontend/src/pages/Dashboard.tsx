@@ -9,7 +9,6 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import DashboardLayout from '../components/DashboardLayout';
 import KPICard from '../components/KPICard';
 import StatusBadge from '../components/StatusBadge';
 import ChartCard from '../components/ChartCard';
@@ -75,8 +74,8 @@ export default function Dashboard() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-6 animate-fade-in relative z-0">
+    <>
+      <div className="p-6 lg:p-8 space-y-6 animate-fade-in relative z-0 min-h-full">
         
         {/* Floating Notification Panel */}
         {notification.show && (
@@ -302,8 +301,9 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 }

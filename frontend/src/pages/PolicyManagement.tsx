@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ShieldCheck, CloudRain, Wind, Thermometer, AlertTriangle, CloudLightning, ShieldAlert, Zap, Lock, FilterX, HelpCircle, CheckCircle2, Search, ArrowRight } from 'lucide-react';
-import DashboardLayout from '../components/DashboardLayout';
 
 const PLANS = [
   {
@@ -43,8 +42,8 @@ export default function PolicyManagement() {
   const [selectedZone, setSelectedZone] = useState('Bangalore - Koramangala');
 
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-8 animate-fade-in">
+    <>
+      <div className="p-6 lg:p-8 space-y-8 animate-fade-in min-h-full">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/[0.06] pb-6">
@@ -221,6 +220,6 @@ export default function PolicyManagement() {
         )}
 
       </div>
-    </DashboardLayout>
+    </>
   );
 }

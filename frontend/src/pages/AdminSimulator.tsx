@@ -154,8 +154,9 @@ export default function AdminSimulator() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <>
+      <div className="p-6 lg:p-8 space-y-6 animate-fade-in min-h-full w-full">
+        <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <MonitorCheck className="text-brand-400 w-6 h-6" />
@@ -377,6 +378,7 @@ export default function AdminSimulator() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

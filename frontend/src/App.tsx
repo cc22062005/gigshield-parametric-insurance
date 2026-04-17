@@ -11,7 +11,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* Core Layout Routes */}
+        <Route path="/dashboard" element={<DashboardLayout><Dashboard /></DashboardLayout>} />
         <Route path="/policies" element={<DashboardLayout><PolicyManagement /></DashboardLayout>} />
         <Route path="/claims" element={<DashboardLayout><ClaimsManagement /></DashboardLayout>} />
         <Route path="/admin" element={<DashboardLayout><AdminSimulator /></DashboardLayout>} />

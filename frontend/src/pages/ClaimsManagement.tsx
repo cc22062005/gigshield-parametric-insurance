@@ -1,5 +1,4 @@
 import { Activity, ShieldCheck, AlertTriangle, CloudRain, Wind, ActivitySquare, ShieldAlert, BadgeCheck, CheckCircle2, ChevronRight, XCircle, Search } from 'lucide-react';
-import DashboardLayout from '../components/DashboardLayout';
 
 const CLAIMS = [
   {
@@ -48,8 +47,8 @@ const CLAIMS = [
 
 export default function ClaimsManagement() {
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-8 animate-fade-in">
+    <>
+      <div className="p-6 lg:p-8 space-y-8 animate-fade-in min-h-full">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6">
@@ -158,6 +157,6 @@ export default function ClaimsManagement() {
         </div>
 
       </div>
-    </DashboardLayout>
+    </>
   );
 }
